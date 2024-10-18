@@ -13,7 +13,8 @@
        <body name="trunk" pos="0 0 .105">
            <joint type="free"/>
            <geom type="box" size=".02 .02 .02" pos="0 0 0" rgba="1 0 0 1"/>
-           
+           <site name="body" />
+
    
              <body name="leg1" pos="0 0.02 -.02">
                  <joint name="j1" type="hinge" axis="0 1 0" pos="0 0 0"  damping=".01" />
@@ -67,5 +68,12 @@
        <position name="m2" joint="j2" kp="1" forcelimited="true" forcerange="-.05 .05"/>
    
      </actuator>
-   
+     <sensor>
+        <velocimeter name="body_v" site="body" />
+        <gyro name="body_w" site="body" />
+        <framepos name="body_pos" objtype="site" objname="body" reftype="geom" refname="floor" />
+        <framexaxis name="body_x" objtype="site" objname="body" reftype="geom" refname="floor" />
+        <frameyaxis name="body_y" objtype="site" objname="body" reftype="geom" refname="floor" />
+        <framezaxis name="body_z" objtype="site" objname="body" reftype="geom" refname="floor" />
+      </sensor>
    </mujoco>

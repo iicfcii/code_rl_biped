@@ -62,22 +62,12 @@ class BipedEnv(gymnasium.Env):
 
     reward_weights = {}
     reward_weights['forward_progress'] = 3e0
-    reward_weights['episode_time'] = 0
     reward_weights['current_velocity'] = 1e1
-    reward_weights['z_violation'] = -0
-    reward_weights['tip_angle'] = -0
-    reward_weights['control_cost'] = 0 
-    reward_weights['constraint_violation_angle'] = -0
-    reward_weights['efficiency'] = 0
-    reward_weights['energy_produced_per_gait_cycle'] = 0e3
-    reward_weights['energy_consumed_per_gait_cycle'] = -1e1 
-    reward_weights['cycle_efficiency'] = 0e-1 
-    reward_weights['action_actual'] = -1e0
 
   
     def __init__(self, render_mode=None, controller_freq = 100):
         self.action_space = spaces.Box(low=-math.pi/2, high=math.pi/2, shape=(self.num_actuators,),dtype=np.float64)
-        self.observation_space = spaces.Box(low=-1, high=1, shape=(3,),dtype=np.float64)
+        self.observation_space = spaces.Box(low=-1, high=1, shape=(18,),dtype=np.float64)
 
         my_model_path ='my_envs/biped.xml'
 
@@ -158,6 +148,27 @@ class BipedEnv(gymnasium.Env):
         if self.mujoco_renderer is not None:
             self.mujoco_renderer.close()    
 
+
+    def _get_obs(self):
+
+        obs = []
+        obs.append(self.data.sensor('body_pos').data.copy())        
+        obs.append(self.data.sensor('body_v').data.copy())      
+        obs.append(self.data.sensor('body_w').data.copy())        
+        obs.append(self.data.sensor('body_x').data.copy())        
+        obs.append(self.data.sensor('body_y').data.copy())        
+        obs.append(self.data.sensor('body_z').data.copy())
+        obs = numpy.array(obs).flatten()        
+
+        if any(numpy.isinf(obs)):
+            raise EarlyTerm
+
+        if any(numpy.isnan(obs)):
+            raise EarlyTerm
+
+        return obs
+
+
     def step(self, action):
         # print(action.shape)
         if np.array(action).shape != (self.model.nu,):
@@ -177,7 +188,7 @@ class BipedEnv(gymnasium.Env):
         vel = pos - last_pos
 
         observation = self._get_obs()
-        reward = pos[0]+vel[0]
+        reward = pos[0]*self.reward_weights['forward_progress']+vel[0]*self.reward_weights['current_velocity']
         
         truncated = False
         info = {}
@@ -188,7 +199,3 @@ class BipedEnv(gymnasium.Env):
 
     def _mju_user_warning(self, e):
         self.early_term = True
-    def _get_obs(self):
-        obs = self.data.body('trunk').xpos
-    
-        return obs
