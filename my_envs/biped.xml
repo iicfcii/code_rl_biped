@@ -1,0 +1,71 @@
+<mujoco>
+    <option>
+       <flag energy="enable"/>
+     </option>
+     <option>
+        <flag gravity="enable" contact="enable" />
+     </option>
+     <option timestep="{ts:1.3e}"/>
+     <compiler angle="degree" />
+       <visual><global offwidth="{width}" offheight="{height}" /></visual>    
+   
+     <worldbody>
+       <body name="trunk" pos="0 0 .105">
+           <joint type="free"/>
+           <geom type="box" size=".02 .02 .02" pos="0 0 0" rgba="1 0 0 1"/>
+           
+   
+             <body name="leg1" pos="0 0.02 -.02">
+                 <joint name="j1" type="hinge" axis="0 1 0" pos="0 0 0"  damping=".01" />
+                 <geom type="box" size=".005 .005 .02" pos="0 0 -0.02" rgba="1 0 0 1"/>
+                 <body name="leg12" pos="0 0 -.04">
+                     <joint name="j12" type="hinge" axis="0 1 0" pos="0 0 0" stiffness=".1" damping=".01" limited="true" range="0 180" />
+                     <geom type="box" size=".005 .005 .02" pos="0 0 -0.02" rgba="1 0 0 1"/>
+                     <body name="ankle1" pos="0 0 -0.04">forcelimited
+                       <joint name="a1" type="hinge" axis="0 1 0"  stiffness="{k}" damping="{b}"/>
+                       <geom type="box" size="{l_ankle} .02 .005" pos="0 0 0" rgba="1 0 0 1"/>
+                     </body>
+                 </body>
+             </body>
+       
+             <body name="leg2" pos="0 -0.02 -.02">
+                 <joint name="j2" type="hinge" axis="0 1 0" pos="0 0 0" damping=".01" />
+                 <geom type="box" size=".005 .005 .02" pos="0 0 -0.02" rgba="1 0 0 1"/>
+                 <body name="leg22" pos="0 0 -.04">
+                     <joint name="j22" type="hinge" axis="0 1 0" pos="0 0 0" stiffness=".1" damping=".01" limited="true" range="0 180" />
+                     <geom type="box" size=".005 .005 .02" pos="0 0 -0.02" rgba="1 0 0 1"/>
+                     <body name="ankle2" pos="0 0 -0.04">
+                       <joint name="a2" type="hinge" axis="0 1 0"  stiffness="{k}" damping="{b}"/>
+                       <geom type="box" size="{l_ankle} .02 .005" pos="0 0 0" rgba="1 0 0 1"/>
+                     </body>
+                 </body>
+             </body>
+   
+       </body>
+       <light name="top" pos="0 0 1"/>
+       <camera name="world" mode="fixed" pos="0 -.5 .05" axisangle="1 0 0 90"/>
+       <camera name="target" mode="targetbody" target="trunk" pos="0 -.5 .05" axisangle="1 0 0 90" />
+   
+       
+       <body name="floor" pos="0 0 0">
+         <geom name="floor" pos="0 0 0" size="1 1 .1" type="plane" rgba="1 0.83 0.61 0.5"/>
+       </body>
+     </worldbody>
+   
+      <contact>
+   <!--
+   <exclude body1="leg1_l4" body2="leg1_l4_2" />
+   -->
+     </contact>
+     
+     <actuator>
+   <!--
+       <motor name="m1" joint="j1"/>
+       <motor name="m2" joint="j2"/>
+   -->
+       <position name="m1" joint="j1" kp="1" forcelimited="true" forcerange="-.05 .05"/>
+       <position name="m2" joint="j2" kp="1" forcelimited="true" forcerange="-.05 .05"/>
+   
+     </actuator>
+   
+   </mujoco>
