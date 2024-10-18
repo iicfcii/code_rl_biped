@@ -165,14 +165,15 @@ class BipedEnv(gymnasium.Env):
             -1e-6 * np.sum(da**2),
             # Penalize joints going over limits. 
             -10 * np.sum(q_off_limits**2),
-            # Penalize average joint angles so that joints stay centered (around 0)
+            # Penalize average joint angles so that joints oscillates around 0 (vertical). 
             -0.5 * np.sum(q_mean**2),
         ])
 
         self.last_action = action
         observation = self._get_obs()
         reward = np.sum(rewards)
-        
+
+        # Once the robot falls, it can't really get back up so the data afterwards are not useful. 
         if np.any(np.abs(body_z[:2])>0.7):
             self.truncated=True
         info = {}
